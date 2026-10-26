@@ -7,6 +7,7 @@ build/
 *.lst
 *.tmp
 *.lock
+*.zip
 
 # OS metadata
 .DS_Store

@@ -16,15 +16,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Prepare Release Package
+      - name: Prepare Complete SD Package
         run: |
-          mkdir -p staging/switch
-          mkdir -p staging/atmosphere/contents/0100000000001000/exefs
-          cp lonetlaunch.nro staging/switch/
-          cp -r atmosphere/contents/0100000000001000/exefs/* staging/atmosphere/contents/0100000000001000/exefs/
-          cd staging
-          zip -r ../LonetLaunch-${{ github.ref_name }}.zip switch atmosphere
-          cd ..
+          zip -r LonetLaunch-Complete-SD.zip atmosphere slaunch switch
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -34,26 +28,24 @@ jobs:
           prerelease: false
           generate_release_notes: true
           body: |
-            ## 🌌 LonetLaunch ${{ github.ref_name }}
+            ## 🌌 LonetLaunch ${{ github.ref_name }} - Complete Working Package
             
-            ¡Primera versión oficial de **LonetLaunch** para Nintendo Switch!
-
-            ### ✨ Novedades y Características:
-            - **60 FPS Estables y Fluidos:** Renderizado acelerado por hardware con GPU Tegra X1 via SDL2.
-            - **Carga Asíncrona Multi-hilo (C++20):** La lectura de iconos y metadatos no congela la pantalla al desplazarse.
-            - **Sistema Failsafe Anti-Bootloop:**
-              - Presiona **L + R** o **MINUS (-)** al encender para desactivar el launcher en caso de emergencia.
-              - Watchdog de detección de cierres inesperados.
-            - **Resolución Adaptativa:** Escalado automático entre 1080p (Modo TV) y 720p (Modo Portátil).
-            - **Batería y Reloj del Sistema en Tiempo Real.**
+            Paquete completo con la arquitectura comprobada de reemplazo de HOME Menu para Nintendo Switch (Atmosphère).
+            
+            ### 🎮 ¿Qué incluye este paquete?
+            - **sSystem (`atmosphere/contents/0100000000001000/`):** Daemon del sistema que gestiona el arranque, suspensión y llamadas de Horizon OS sin cuelgues ni pantallas negras.
+            - **sMenu (`slaunch/bin/sMenu/`):** Menú gráfico acelerado por hardware (OpenGL) con vistas Grid, Coverflow, XMB y Shelf.
+            - **Widgets en Lua y Música de fondo:** Widgets interactivos de reloj, clima y batería, más reproductor de audio nativo.
+            - **sInstaller (`switch/sInstaller/`):** Instalador gráfico que puedes abrir directamente desde el Homebrew Menu.
 
             ---
 
-            ### 📦 ¿Cómo instalar?
-            1. Descarga el archivo **`LonetLaunch-${{ github.ref_name }}.zip`**.
-            2. Extrae el contenido en la **raíz de tu tarjeta MicroSD**.
-               - El archivo `switch/lonetlaunch.nro` se ubicará en la carpeta `/switch/`.
-               - Los archivos de `atmosphere/` se ubicarán en su carpeta correspondiente para reemplazar el menú HOME.
+            ### 🚀 ¿Cómo instalarlo?
+            #### Opción A (Automática desde la Switch):
+            Copia `switch/sInstaller/sInstaller.nro` a tu tarjeta SD, abre el Homebrew Menu en la Switch y presiona **Install**.
+            
+            #### Opción B (Manual):
+            Descarga **`LonetLaunch-Complete-SD.zip`** y extrae las 3 carpetas (`atmosphere`, `slaunch`, `switch`) en la **raíz de tu tarjeta MicroSD**.
           files: |
-            LonetLaunch-${{ github.ref_name }}.zip
-            lonetlaunch.nro
+            LonetLaunch-Complete-SD.zip
+            switch/sInstaller/sInstaller.nro
