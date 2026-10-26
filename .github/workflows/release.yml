@@ -1,0 +1,59 @@
+name: Publish Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare Release Package
+        run: |
+          mkdir -p staging/switch
+          mkdir -p staging/atmosphere/contents/0100000000001000/exefs
+          cp lonetlaunch.nro staging/switch/
+          cp -r atmosphere/contents/0100000000001000/exefs/* staging/atmosphere/contents/0100000000001000/exefs/
+          cd staging
+          zip -r ../LonetLaunch-${{ github.ref_name }}.zip switch atmosphere
+          cd ..
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: LonetLaunch ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          body: |
+            ## 🌌 LonetLaunch ${{ github.ref_name }}
+            
+            ¡Primera versión oficial de **LonetLaunch** para Nintendo Switch!
+
+            ### ✨ Novedades y Características:
+            - **60 FPS Estables y Fluidos:** Renderizado acelerado por hardware con GPU Tegra X1 via SDL2.
+            - **Carga Asíncrona Multi-hilo (C++20):** La lectura de iconos y metadatos no congela la pantalla al desplazarse.
+            - **Sistema Failsafe Anti-Bootloop:**
+              - Presiona **L + R** o **MINUS (-)** al encender para desactivar el launcher en caso de emergencia.
+              - Watchdog de detección de cierres inesperados.
+            - **Resolución Adaptativa:** Escalado automático entre 1080p (Modo TV) y 720p (Modo Portátil).
+            - **Batería y Reloj del Sistema en Tiempo Real.**
+
+            ---
+
+            ### 📦 ¿Cómo instalar?
+            1. Descarga el archivo **`LonetLaunch-${{ github.ref_name }}.zip`**.
+            2. Extrae el contenido en la **raíz de tu tarjeta MicroSD**.
+               - El archivo `switch/lonetlaunch.nro` se ubicará en la carpeta `/switch/`.
+               - Los archivos de `atmosphere/` se ubicarán en su carpeta correspondiente para reemplazar el menú HOME.
+          files: |
+            LonetLaunch-${{ github.ref_name }}.zip
+            lonetlaunch.nro
